@@ -20,6 +20,17 @@ export default function Projects() {
             whileHover={{ y: -6 }}
           >
             <div className="project-banner">
+              {project.image ? (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className="project-banner-img"
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              ) : null}
               <ProjectBanner variant={project.banner} />
             </div>
             <div className="project-body">

@@ -1,9 +1,73 @@
-import { motion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 import { profile } from '../data/portfolioData';
 import avatarImg from '../assets/avatar.png';
 
 export default function Contact() {
   const roleLine = profile.roles.join(' · ');
+  const formRef = useRef(null);
+
+  const [fields, setFields] = useState({ name: '', email: '', message: '' });
+  const [status, setStatus] = useState('idle'); // idle | sending | success | error
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleChange = (e) =>
+    setFields((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!fields.name || !fields.email || !fields.message) return;
+
+    setStatus('sending');
+    setErrorMsg('');
+
+    try {
+      // 1️⃣ Send email securely via FormSubmit alias to sonamkorade25@gmail.com
+      const res = await fetch('https://formsubmit.co/ajax/fdf284ca62dcabdb10770265aedd831b', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: fields.name,
+          email: fields.email,
+          message: fields.message,
+          _subject: `New Portfolio Message from ${fields.name}`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok && data.success !== 'true' && data.success !== true) {
+        throw new Error(data.message || 'Failed to send message');
+      }
+
+      // 2️⃣ Optional: Also save to Firestore for Admin panel if Firebase is configured
+      try {
+        if (db && import.meta.env.VITE_FIREBASE_API_KEY && import.meta.env.VITE_FIREBASE_API_KEY !== 'your_api_key_here') {
+          await addDoc(collection(db, 'messages'), {
+            name: fields.name,
+            email: fields.email,
+            message: fields.message,
+            createdAt: serverTimestamp(),
+          });
+        }
+      } catch (dbErr) {
+        console.warn('Firestore backup save:', dbErr);
+      }
+
+      setStatus('success');
+      setFields({ name: '', email: '', message: '' });
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(`Failed to send message. You can also email directly at ${profile.email}`);
+      setStatus('error');
+    }
+  };
 
   return (
     <section id="contact" className="section">
@@ -59,29 +123,9 @@ export default function Contact() {
                 />
               </svg>
             </a>
-
-            <a
-              href={profile.linktree}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Linktree"
-              className="contact-icon-btn"
-            >
-              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                <g
-                  stroke="currentColor"
-                  strokeWidth="2.1"
-                  strokeLinecap="round"
-                >
-                  <line x1="12" y1="2.5" x2="12" y2="21.5" />
-                  <line x1="4.2" y1="6.75" x2="19.8" y2="17.25" />
-                  <line x1="19.8" y1="6.75" x2="4.2" y2="17.25" />
-                </g>
-              </svg>
-            </a>
           </div>
 
-          {/* CTA button */}
+          {/* Resume download */}
           <a
             href={profile.resume}
             className="contact-resume-btn"
@@ -98,16 +142,124 @@ export default function Contact() {
           </a>
         </div>
 
-        {/* ── Right column ── */}
-        <div className="contact-right">
-          <div className="avatar-wrap">
+        {/* ── Right column — Connect form ── */}
+        <div className="contact-right contact-form-side">
+          
+          {/* Avatar (Restored) */}
+          <div className="avatar-wrap" style={{ marginBottom: '16px' }}>
             <div className="avatar-glow" />
             <img className="avatar" src={avatarImg} alt="Sonam Korade" />
           </div>
-          <p className="status">
+          <p className="status" style={{ justifyContent: 'center', marginBottom: '24px' }}>
             <span className="dot" />
             Open to opportunities
           </p>
+
+          <AnimatePresence mode="wait">
+            {status === 'success' ? (
+              <motion.div
+                key="success"
+                className="contact-success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="success-icon"></div>
+                <h3>Message sent!</h3>
+                <p>Thanks for reaching out. I'll get back to you soon.</p>
+                <button
+                  className="contact-reset-btn"
+                  onClick={() => setStatus('idle')}
+                >
+                  Send another
+                </button>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                ref={formRef}
+                className="contact-form"
+                onSubmit={handleSubmit}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.4 }}
+              >
+                <p className="form-heading">
+                  <span className="dot-pulse" />
+                  Connect with me
+                </p>
+
+                <div className="form-group">
+                  <label htmlFor="cf-name">Your Name</label>
+                  <input
+                    id="cf-name"
+                    name="name"
+                    type="text"
+                    placeholder="Jane Doe"
+                    value={fields.name}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="cf-email">Email Address</label>
+                  <input
+                    id="cf-email"
+                    name="email"
+                    type="email"
+                    placeholder="jane@example.com"
+                    value={fields.email}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="cf-message">Message</label>
+                  <textarea
+                    id="cf-message"
+                    name="message"
+                    rows={4}
+                    placeholder="Hi Sonam, I'd love to connect about..."
+                    value={fields.message}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+
+                {status === 'error' && (
+                  <p className="form-error">{errorMsg}</p>
+                )}
+
+                <button
+                  type="submit"
+                  className="contact-send-btn"
+                  id="contact-send-btn"
+                  disabled={status === 'sending'}
+                >
+                  {status === 'sending' ? (
+                    <>
+                      <span className="spinner" />
+                      Sending…
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                        <path
+                          fill="currentColor"
+                          d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"
+                        />
+                      </svg>
+                      Send Message
+                    </>
+                  )}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
     </section>
