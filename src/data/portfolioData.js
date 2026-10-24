@@ -106,6 +106,17 @@ export const projects = [
     banner: 'studymate',
     image: '/projects/studymate.jpg',
   },
+  {
+    id: 'reviewflow',
+    title: 'ReviewFlow – Restaurant Review & Loyalty Platform',
+    description:
+      'A full-stack SaaS platform that helps restaurants collect customer feedback, increase Google review engagement, and manage restaurant-specific QR code requests through an approval-based workflow — with an anonymous customer loyalty system featuring digital stamp cards, optional phone-number recognition, and reward redemption.',
+    tags: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Prisma', 'Firebase', 'Google Reviews', 'QR Codes'],
+    banner: 'reviewflow',
+    image: '/projects/reviewflow.jpg',
+    liveDemo: 'https://qr-ai-bbn0.onrender.com',
+    github: 'https://github.com/sonamk27/QR_AI',
+  },
 ];
 
 export const freelance = {

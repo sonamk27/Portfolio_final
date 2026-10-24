@@ -137,5 +137,43 @@ export default function ProjectBanner({ variant }) {
     );
   }
 
+  if (variant === 'reviewflow') {
+    return (
+      <svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="pg6" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#2b1140" />
+            <stop offset="1" stopColor="#7e2f63" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="200" fill="url(#pg6)" />
+        <circle cx="330" cy="34" r="60" fill="#ff5d8f" opacity="0.16" />
+        <circle cx="48" cy="174" r="72" fill="#ffc24b" opacity="0.12" />
+
+        {/* QR code card */}
+        <rect x="30" y="25" width="150" height="150" rx="14" fill="#ffffff" />
+        <rect x="43" y="38" width="124" height="124" rx="8" fill="#1c1026" />
+        <g fill="#ffffff">
+          <rect x="60" y="55" width="10" height="10" rx="2" />
+          <rect x="82" y="55" width="10" height="10" rx="2" />
+          <rect x="104" y="55" width="10" height="10" rx="2" />
+          <rect x="60" y="77" width="10" height="10" rx="2" />
+          <rect x="104" y="77" width="10" height="10" rx="2" />
+          <rect x="60" y="99" width="10" height="10" rx="2" />
+          <rect x="82" y="99" width="10" height="10" rx="2" />
+          <rect x="104" y="99" width="10" height="10" rx="2" />
+          <rect x="60" y="121" width="10" height="10" rx="2" />
+          <rect x="82" y="121" width="10" height="10" rx="2" />
+        </g>
+
+        {/* Google review bubble */}
+        <rect x="202" y="26" width="162" height="64" rx="16" fill="#ffffff" opacity="0.96" />
+        <path d="M222 46 l6 12 13 2 -10 9 3 13 -12 -7 -12 7 3 -13 -10 -9 13 -2z" fill="#ffb703" />
+        <rect x="244" y="38" width="92" height="8" rx="4" fill="#e5e7eb" />
+        <rect x="244" y="52" width="64" height="8" rx="4" fill="#e5e7eb" />
+      </svg>
+    );
+  }
+
   return null;
 }

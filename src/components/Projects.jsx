@@ -36,6 +36,28 @@ export default function Projects() {
             <div className="project-body">
               <h3>{project.title}</h3>
               <p>{project.description}</p>
+              <div className="project-links">
+                {project.liveDemo ? (
+                  <a
+                    href={project.liveDemo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                  >
+                    Live Demo
+                  </a>
+                ) : null}
+                {project.github ? (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-ghost"
+                  >
+                    GitHub
+                  </a>
+                ) : null}
+              </div>
               <div className="project-tags">
                 {project.tags.map((tag) => (
                   <span className="tag" key={tag}>{tag}</span>
