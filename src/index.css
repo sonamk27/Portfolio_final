@@ -515,6 +515,54 @@ svg {
   box-shadow: 0 16px 40px rgba(0, 0, 0, .3);
 }
 
+/* ---------- Project card flip ---------- */
+.project-card {
+  perspective: 1400px;
+  cursor: pointer;
+}
+
+.flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.35, 0.8, 0.3, 1);
+}
+
+.project-card.is-flipped .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.flip-back h3 {
+  font-size: 1.15rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.flip-back p {
+  color: var(--text-dim);
+  font-size: .9rem;
+  flex: 1;
+  line-height: 1.6;
+}
+
 .project-banner {
   aspect-ratio: 16/9;
   overflow: hidden;
